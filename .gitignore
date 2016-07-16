@@ -3,3 +3,6 @@ bin
 include
 lib
 secrets.py
+*.pyc
+*.json
+*.gitignore

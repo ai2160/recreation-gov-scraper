@@ -10,16 +10,12 @@
 		"70931"
 	],
 	"emails": [
-		"dan@schlosser.io"
+		"abhilash.i@gmail.com"
 	],
 	"trips": [
 		{
-			"start_date": "07/10/2015",
-			"length": 3
-		},
-		{
-			"start_date": "07/31/2015",
-			"length": 3
+			"start_date": "10/17/2016",
+			"length": 1 
 		}
 	]
 }

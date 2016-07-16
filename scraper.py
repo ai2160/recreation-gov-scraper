@@ -11,6 +11,8 @@ BASE_URL = 'http://www.recreation.gov'
 REQUEST_URL = BASE_URL + '/campsiteCalendar.do'
 MG_URL = 'https://api.mailgun.net/v3/{}/messages'.format(MG_DOMAIN)
 INLINER_URL = 'https://inlinestyler.torchbox.com/styler/convert/'
+UNAVAILABLE_CODES = set(['X', 'R', 'N', 'a'])
+AVAILABLE_CODES = {'A' : 'Reserve', 'W' : 'Walk-up', 'C' : 'Call', 'L' : 'In Lottery'}
 
 config = None
 with open('config.json') as config_file:
@@ -66,26 +68,31 @@ for trip in config['trips']:
         for camp in camps:
             site_number_tag = camp.select('.siteListLabel a')[0]
             site_number = site_number_tag.string
-            site_url = site_number_tag['href']
+            site_url = BASE_URL + site_number_tag['href']
             if site_number.startswith('HRS'):  # horse campsite
                 continue
 
             status_tags = camp.select('.status')
             for day_str, status_tag in zip(day_strs, status_tags):
-                if status_tag.string in ('R', 'X'):  # reserved, unavailable
-                    unavail_camps[day_str][camp_name].append(site_number)
-                elif status_tag.string == 'C':
+	        avail = True
+                if status_tag.string in UNAVAILABLE_CODES:  # Unavailable
+		    avail = False
+		else:
+		    url_in_mail = ""
+		    avail = True
+                    try:
+		        url_in_mail = BASE_URL + status_tag.find('a')['href']
+		    except Exception as e:
+		        url_in_mail = site_url
+			if status_tag.string != 'C': #Call only sites won't have URL
+			    avail = False
+	        if avail:
                     avail_camps[day_str][camp_name].append((site_number,
-                                                            site_url,
-                                                            'call'))
+                                 url_in_mail,
+                                 AVAILABLE_CODES[status_tag.string]))
                     found += 1
-
-                else:
-                    reservation_url = BASE_URL + status_tag.find('a')['href']
-                    avail_camps[day_str][camp_name].append((site_number,
-                                                            reservation_url,
-                                                            'reserve'))
-                    found += 1
+		else:
+		    unavail_camps[day_str][camp_name].append(site_number)
 
     body += TRIP.format(trip['start_date'])
     for day_str, camps in iter(sorted(avail_camps.iteritems())):
