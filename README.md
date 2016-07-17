@@ -2,6 +2,7 @@ Recreation.gov Scraper
 ================
 
 Notifies you when campsites in a park/recreation area you are interested is available for booking.
+
 This project is under active development and any help fixing open issues or improving the project is greately appreciated.
 
 Usage
