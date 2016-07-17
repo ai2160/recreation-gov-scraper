@@ -38,6 +38,20 @@ CAMP = '''<li>
 '''
 SITE = '<li>{} (<a href="{}">{}</a>)</li>'
 
+def valid_site(name):
+    name = name.upper()
+    if name.startswith('HRS'):
+       return False
+    if name.startswith('RV'):
+       return False
+    if name.startswith('BOAT'):
+       return False
+    if name.find('GROUP') != -1:
+       return False
+    if name.find('LG') != -1:
+       return False
+    return True
+
 found = 0
 for trip in config['trips']:
 
@@ -69,27 +83,30 @@ for trip in config['trips']:
             site_number_tag = camp.select('.siteListLabel a')[0]
             site_number = site_number_tag.string
             site_url = BASE_URL + site_number_tag['href']
-            if site_number.startswith('HRS'):  # horse campsite
-                continue
+	    site_loop = camp.find('div', attrs={'class': 'loopName'}).text
+
+	    if not valid_site(site_number):
+	       continue
+
+            if not valid_site(site_loop):
+	       continue
 
             status_tags = camp.select('.status')
             for day_str, status_tag in zip(day_strs, status_tags):
-	        avail = True
-                if status_tag.string in UNAVAILABLE_CODES:  # Unavailable
-		    avail = False
-		else:
+	        avail = False
+		if status_tag.text[0] in AVAILABLE_CODES:
 		    url_in_mail = ""
 		    avail = True
                     try:
 		        url_in_mail = BASE_URL + status_tag.find('a')['href']
 		    except Exception as e:
 		        url_in_mail = site_url
-			if status_tag.string != 'C': #Call only sites won't have URL
+			if status_tag.text[0] != 'C': #Call only sites won't have URL
 			    avail = False
 	        if avail:
                     avail_camps[day_str][camp_name].append((site_number,
                                  url_in_mail,
-                                 AVAILABLE_CODES[status_tag.string]))
+                                 AVAILABLE_CODES[status_tag.text[0]]))
                     found += 1
 		else:
 		    unavail_camps[day_str][camp_name].append(site_number)
@@ -118,7 +135,7 @@ h = HTMLParser.HTMLParser()
 inlined_html = h.unescape(response.text)
 
 requests.post(MG_URL, auth=('api', MG_KEY), data={
-    'from': '"Yosemite Campsite Scraper" <yosemite@schlosser.io>',
+    'from': '"Campsite Scraper" <camper@westerncamperphoto.com>',
     'to': ','.join(config['emails']),
     'subject': 'Found {} camp sites near Yosemite'.format(found),
     'html': inlined_html

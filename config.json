@@ -1,25 +1,59 @@
 {
-	"park_ids": [
-		"70924",
-		"70925",
-		"70926",
-		"70927",
-		"70928",
-		"70929",
-		"70930",
-		"70931"
-	],
-	"emails": [
-		"dan@schlosser.io"
-	],
-	"trips": [
-		{
-			"start_date": "07/10/2015",
-			"length": 3
-		},
-		{
-			"start_date": "07/31/2015",
-			"length": 3
-		}
-	]
+    "emails": [
+        "abhilash.i@gmail.com"
+    ], 
+    "park_ids": [
+        "72393", 
+        "70926"
+    ], 
+    "trips": [
+        {
+            "length": 1, 
+            "start_date": "07/23/2016"
+        }, 
+        {
+            "length": 1, 
+            "start_date": "07/30/2016"
+        }, 
+        {
+            "length": 1, 
+            "start_date": "08/06/2016"
+        }, 
+        {
+            "length": 1, 
+            "start_date": "08/13/2016"
+        }, 
+        {
+            "length": 1, 
+            "start_date": "08/20/2016"
+        }, 
+        {
+            "length": 1, 
+            "start_date": "08/27/2016"
+        }, 
+        {
+            "length": 1, 
+            "start_date": "09/03/2016"
+        }, 
+        {
+            "length": 1, 
+            "start_date": "09/04/2016"
+        }, 
+        {
+            "length": 1, 
+            "start_date": "09/10/2016"
+        }, 
+        {
+            "length": 1, 
+            "start_date": "09/17/2016"
+        }, 
+        {
+            "length": 1, 
+            "start_date": "09/24/2016"
+        }, 
+        {
+            "length": 1, 
+            "start_date": "10/01/2016"
+        }
+    ]
 }
