@@ -1,7 +1,0 @@
-#! /bin/bash
-i=0
-while [ "$i" -ne 1 ]
-do
-  i="python scraper.py"
-  sleep 300
-done
