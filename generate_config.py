@@ -9,7 +9,7 @@ delta = timedelta(days=1)
 d = start
 
 jobj = {}
-jobj['park_ids'] = ['72393', '70926']
+jobj['park_ids'] = ['72393']
 jobj['emails'] = ['abhilash.i@gmail.com']
 jobj['trips'] = []
 

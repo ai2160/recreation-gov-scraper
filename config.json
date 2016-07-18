@@ -3,8 +3,7 @@
         "abhilash.i@gmail.com"
     ], 
     "park_ids": [
-        "72393", 
-        "70926"
+        "72393"
     ], 
     "trips": [
         {
@@ -34,10 +33,6 @@
         {
             "length": 1, 
             "start_date": "09/03/2016"
-        }, 
-        {
-            "length": 1, 
-            "start_date": "09/04/2016"
         }, 
         {
             "length": 1, 

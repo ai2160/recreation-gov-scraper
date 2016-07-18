@@ -1,6 +1,7 @@
 #! /bin/bash
-virtualenv --no-site-packages .
-source bin/activate
-pip install -r requirements.txt
-python scraper.py
-
+i=0
+while [ "$i" -ne 1 ]
+do
+  i="python scraper.py"
+  sleep 300
+done
