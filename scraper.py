@@ -155,7 +155,13 @@ if __name__ == '__main__':
     while 1:
        global body
        body = ''
-       found = scrape_info()
+       found = None
+
+       try:
+          found = scrape_info()
+       except Exception as e:
+          logger.error("Exception occured:\n%s" % e.args)
+
        if found:
           logger.info('Found some campsites')
           send_email()
