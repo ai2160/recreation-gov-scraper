@@ -71,12 +71,14 @@ def scrape_info():
         unavail_camps = dict((day_str, defaultdict(list)) for day_str in day_strs)
     
         for park_id in config['park_ids']:
-            response = requests.get(REQUEST_URL, params={
+	    payload = {
                 'page': 'matrix',
                 'contractCode': 'NRSO',
                 'calarvdate': trip['start_date'],
                 'parkId': park_id
-            })
+	    }
+            payload_str = '&'.join("%s=%s" % (k,v) for k,v in payload.items())
+            response = requests.get(REQUEST_URL, params=payload_str)
 	    
             if not response.ok:
                 print "Request failed for park {} on {}".format(park_id,
