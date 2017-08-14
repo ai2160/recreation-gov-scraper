@@ -12,6 +12,7 @@ import logging
 
 global body
 
+found_sites = []
 FORMAT = '%(asctime)-15s %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -66,10 +67,10 @@ def scrape_info():
         start_date = datetime.strptime(trip['start_date'], '%m/%d/%Y')
         days = [start_date + timedelta(days=i) for i in range(trip['length'])]
         day_strs = [day.strftime('%m/%d/%Y') for day in days]
-    
+
         avail_camps = dict((day_str, defaultdict(list)) for day_str in day_strs)
         unavail_camps = dict((day_str, defaultdict(list)) for day_str in day_strs)
-    
+
         for park_id in config['park_ids']:
 	    payload = {
                 'page': 'matrix',
@@ -79,32 +80,36 @@ def scrape_info():
 	    }
             payload_str = '&'.join("%s=%s" % (k,v) for k,v in payload.items())
             response = requests.get(REQUEST_URL, params=payload_str)
-	    
+
             if not response.ok:
                 print "Request failed for park {} on {}".format(park_id,
                                                                 trip['start_date'])
                 continue
-    
+
             soup = BeautifulSoup(response.text, 'html.parser')
             camp_name = soup.find(id='cgroundName').string
             calendar_body = soup.select('#calendar tbody')[0]
             camps = calendar_body.find_all('tr', attrs={'class': None})
-    
+
             for camp in camps:
                 site_number_tag = camp.select('.siteListLabel a')[0]
                 site_number = site_number_tag.string
                 site_url = BASE_URL + site_number_tag['href']
     	        site_loop = camp.find('div', attrs={'class': 'loopName'}).text
-    
+
     	        if not valid_site(site_number):
     	            continue
-    
+
                 if not valid_site(site_loop):
     	            continue
-    
+
                 status_tags = camp.select('.status')
                 for day_str, status_tag in zip(day_strs, status_tags):
         	    avail = False
+                    if (park_id, site_number, day_str) in found_sites:
+                        print "\n\n\nAlready notified for this site ({}, {}, {})!!\n\n\n".format(park_id, site_number, day_str)
+                        continue
+
         	    if status_tag.text[0] in AVAILABLE_CODES:
     		        url_in_mail = ""
 			avail = True
@@ -119,9 +124,10 @@ def scrape_info():
                                      url_in_mail,
                                      AVAILABLE_CODES[status_tag.text[0]]))
                         found += 1
+                        found_sites.append((park_id, site_number, day_str))
     		    else:
     		        unavail_camps[day_str][camp_name].append(site_number)
-    
+
 	global body
         body += TRIP.format(trip['start_date'])
         for day_str, camps in iter(sorted(avail_camps.iteritems())):
@@ -138,18 +144,17 @@ def scrape_info():
 def send_email():
     with open('style.min.css') as css_file:
         html = HTML.format(css_file.read(), body)
-    
+
     response = requests.post(INLINER_URL, data={
         'returnraw': 'y',
         'source': html
     })
     h = HTMLParser.HTMLParser()
     inlined_html = h.unescape(response.text)
-    
     requests.post(MG_URL, auth=('api', MG_KEY), data={
         'from': '"Campsite Scraper" <camper@westerncamperphoto.com>',
         'to': ','.join(config['emails']),
-        'subject': 'Found {} camp sites near Yosemite'.format(found),
+        'subject': 'Found {} camp sites!'.format(found),
         'html': inlined_html
     })
 
@@ -167,7 +172,6 @@ if __name__ == '__main__':
        if found:
           logger.info('Found some campsites')
           send_email()
-	  break
        else:
           logger.info('No campsites found')
        time.sleep(300)
